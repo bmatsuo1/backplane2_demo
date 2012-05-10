@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html><head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<meta name="author" content="Forest Basford, Janrain" >
+<meta name="description" content="Backplane 2.0 demo" >
+<meta name="keywords" content="backplane, backplanespec" >
+<title>Backplane 2.0 demo</title>
+
+<link href="main.css" rel="stylesheet" type="text/css" >
+<link rel="stylesheet" href="./fancybox/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="./google-code-prettify/prettify.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Maven+Pro:400,700" type="text/css" media="screen" />
+
+<!-- <script type="text/javascript" src="https://janraindemo.janrainsso.com/sso.js"></script> -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js" ></script>
+<script type="text/javascript" src="./fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+<script type="text/javascript" src="./fancybox/jquery.easing-1.3.pack.js"></script>
+<script type="text/javascript" src="./json2.js"></script>
+<script type="text/javascript" src="./beautify.js"></script>
+<script type="text/javascript" src="./google-code-prettify/prettify.js"></script>
+<script type="text/javascript" src="./main.js" ></script>
+<script type="text/javascript" src="./backplane2.js" ></script>
+<script type="text/javascript">
+var setupBP = function setupBP() {
+  /*
+   * Initialize Backplane:
+   * This creates a channel and adds a cookie for the channel.
+   * It also sets the function to call when this is complete.
+   */
+  writeTo('event-list', '<li>Using Backplane JS library: ' + Backplane.version + '</li>', true);//init log
+  Backplane(bpReady);
+  Backplane.init({
+    serverBaseURL: "https://backplane2-staging.elasticbeanstalk.com/v2", // CONFIGURE ME
+    busName: "foobar",                                                   // CONFIGURE ME
+    channelExpires: ""
+  });
+}
+function janrainWidgetOnload() {
+  setupBP();
+  janrain.events.onProviderLoginToken.addHandler(function(tokenResponse) {
+    console.log(tokenResponse);
+    closeWidget();
+  })
+}
+</script>
+<script type="text/javascript">
+function scrollDown(){
+  $("#content").animate({ scrollTop: $("#content").prop("scrollHeight") - $('#content').height() }, 1000);
+}
+</script>
+<script type="text/javascript">
+(function() {
+    if (typeof window.janrain !== 'object') window.janrain = {};
+    window.janrain.settings = {};
+    
+    janrain.settings.tokenAction = 'event';
+    janrain.settings.tokenUrl = 'http://bmatsuo.me/~bmatsuo/backplane2_demo'; // CONIFGURE ME
+
+    function isReady() { janrain.ready = true; };
+    if (document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", isReady, false);
+    } else {
+      window.attachEvent('onload', isReady);
+    }
+
+    var e = document.createElement('script');
+    e.type = 'text/javascript';
+    e.id = 'janrainAuthWidget';
+
+    if (document.location.protocol === 'https:') {
+      e.src = 'https://engage-dev.janrain.com/js/lib/foobar/engage.js'; // CONFIGURE ME
+    } else {
+      e.src = 'http://engage-dev.janrain.com/js/lib/foobar/engage.js'; // CONFIGURE ME
+    }
+
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(e, s);
+})();
+/*
+(function() {
+    if (typeof window.janrain !== 'object') window.janrain = {};
+    window.janrain.settings = {};
+
+    janrain.settings.tokenAction = 'event';
+    janrain.settings.tokenUrl = 'http://bmatsuo.me/~bmatsuo/backplane2_demo';
+
+    function isReady() { janrain.ready = true; };
+    if (document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", isReady, false);
+    } else {
+      window.attachEvent('onload', isReady);
+    }
+
+    var e = document.createElement('script');
+    e.type = 'text/javascript';
+    e.id = 'janrainAuthWidget';
+
+    //if (document.location.protocol === 'https:') {
+      e.src = 'https://engage-dev.janrain.com/js/lib/bmatsuo-test/engage.js';
+    //} else {
+    //  e.src = 'http://engage-dev.janrain.com/js/lib/bmatsuo-test/engage.js';
+    //}
+
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(e, s);
+})();
+*/
+</script>
+</head><body style="font-family: 'Maven Pro', sans-serif;" onload="prettyPrint()">
+<script type="text/javascript" >
+var closeWidget = function closeWidget() {
+  /*
+   * This closes the Engage or Capture box if it is open.
+   * In this demo the tokens or codes are discarded.
+   * We just keep the widget open while we wait for the backplane message.
+   *
+   * The tokens or codes could be processed if desired.
+   * Typically this done to sign users into the site as well as the widgets.
+   */
+  //try { RPXNOW.Util.LightBox.close(); } catch(err) { }
+  try { janrain.engage.signin.widget.refresh(); }catch(err){ console.log(err); }
+  try { janrain.engage.signin.modal.close(); }catch(err){ console.log(err); }
+  try { jQuery.fancybox.close(); }catch(err){ }
+}
+var signOut = function signOut() {
+  /*
+   * Sign out just consists of requesting a new channel and reloading the page.
+   */
+  Backplane.resetCookieChannel();
+  //JANRAIN.SSO.ENGAGE.logout({
+  //    sso_server: 'https://janraindemo.janrainsso.com',
+  //    logout_uri: 'http://backplane1-2.janraindemo.com'
+  //});
+  //window.location.reload();
+  return false;
+}
+var bpReady = function bpReady() {
+  /*
+   * This function is called when Backplane.init is complete.
+   */
+  /*
+   * Setup the BP channel in Engage and Capture widgets.
+  */
+  bpChannel = Backplane.getChannelID();
+  console.log("found channel: " + bpChannel);
+  janrain.engage.signin.setBackplaneChannel(bpChannel);
+  console.log("using channel: " + bpChannel.toString());
+  //document.getElementById('capture-signin').href += '&bp_channel='+encodeURIComponent(bpChannel);
+  writeTo('event-list', '<li>Channel created: ' + Backplane.getChannelName() + '</li>');//logging
+  /*
+   * Reveal the sign in links now that Backplane is ready.
+   * Allowing these to be clicked before this would not work.
+   */
+  document.getElementById('engage-signin').style.display = 'inline';
+  //document.getElementById('capture-signin').style.display = 'inline';
+  /*
+   * Here is the subscription event.
+   * This creates a listener that polls the backplane server for new messages.
+   */
+  window.escSubscription = Backplane.subscribe(function(backplaneMessage) {
+    console.log(backplaneMessage)
+    /*
+     * This enclosed function runs when any message is received.
+     */
+    writeTo('event-list', '<li>New '+backplaneMessage.type+' message received.</li>');//logging
+    writeTo('texttwo', '<pre class="prettyprint">'+"\n"+ varDump(backplaneMessage) + '</pre>'); prettyPrint();//logging
+    closeWidget();
+    scrollDown();//decorative
+    /*
+     * Sign in for the demo is minimal. We attempt to welcome the user by name.
+     * Collect and display an avatar if possible.
+     * We change the Sign In into a Sign Out.
+     * Only sign in if the message type is correct.
+     */
+    if (backplaneMessage.type == 'identity/login') {
+      writeTo('event-list', '<li>Sign user in.</li>');//logging
+      var avatarUrl = '';
+      try {
+        avatarUrl = backplaneMessage.payload.identities.entry.accounts[0].photos[0].value;
+      } catch(err) {
+      }
+      var avatar = '';
+      if ( avatarUrl != '' ) {
+        avatar = '<img src="'+avatarUrl+'" style="float:left; width:50px; padding:2px;">';
+      }
+      writeTo('welcome-msg', avatar+'Welcome, '+backplaneMessage.payload.identities.entry.displayName, true);
+      writeTo('sign-out', 'Sign Out', true);
+      document.getElementById('sign-out').href = "#";    document.getElementById('sign-out').onclick = signOut;
+      showSide();
+    }
+    /*
+     * If we had no further interest in backplane events we could stop listening.
+     * Most live deployments would stop listening after sign in.
+     * This would avoid running the sign in again. 
+     * If other events are expected another subscription would be made or 
+     * conditionals would be added to this one for the other message types.
+     */
+    //Backplane.unsubscribe(window.escSubscription);
+  });
+  writeTo('event-list', '<li>Subscribed to channel.</li>');//logging
+  /*
+   * Expecting a message type will increase the polling for that type for up to 60 seconds or until it is received.
+   * Here we are firing the expectMessages on listeners for the sign in links.
+  */
+  try {
+    document.getElementById('engage-signin').addEventListener('click',function() {
+      Backplane.expectMessages('identity/login');
+      writeTo('event-list', '<li>Expecting messages.</li>');//logging
+    },false);
+  } catch(err) {
+    console.log(err);
+  }
+  //try {
+  //  document.getElementById('capture-signin').addEventListener('click',function() {
+  //    Backplane.expectMessages('identity/login');
+  //    writeTo('event-list', '<li>Expecting messages.</li>');//logging
+  //  },false);
+  //} catch(err) {
+  //  console.log(err);
+  //}
+}
+</script>
+<div id="container" >
+<div id="top" >
+<h1>Backplane v2 demo</h1>
+<!-- <a id="engage-signin" class="janrainEngage" href="#">Sign-In</a> -->
+<a id="engage-signin" class="janrainEngage" onclick="return false;" href="#">Engage Sign In</a>
+<!-- <a id="capture-signin" class="iframe fancy" href="https://demo.janraincapture.com/oauth/signin?response_type=code&client_id=ukae3xqxq628pva6xqq9bjjuqgmvaxjy&xd_receiver=http%3A%2F%2Fbackplane1-2.janraindemo.com%2Fxdcomm.html&redirect_uri=http%3A%2F%2Fbackplane1-2.janraindemo.com%2Ftoken.html">Capture Sign In</a> -->
+<div id="welcome">
+<div id="welcome-msg"></div>
+<div id="profile"></div>
+<a id="sign-out" href=""></a>
+</div>
+<div class="clear"> </div>
+</div>
+<div id="leftside" style="width:0%;">
+<div id="jscode-div">
+<!--
+<a id="clicky" href="#" onclick="toggleSide(); return false;" title="collapse">expand</a> or 
+-->
+<a id="box-js" href="#jscode-popup" onclick="return false">view the code</a>
+<div id="jscode"></div>
+<div style="display:none"><div id="jscode-popup" style="font-size:12px"></div></div>
+</div>
+<div class="clear"> </div>
+</div>
+<div id="content" style="width:100%">
+<div id="information">
+<h3> Demo Information: </h3>
+<p>This is a technology demonstration for the <a href="http://backplanespec.com/" target="_blank">Backplane Spec</a><p>
+<ol>
+<li>Sign in with Engage or Capture.</li>
+<li>Janrain's server will send a message to the backplane server.</li>
+<li>When this message is received by the subscribed backplane listener you will be "signed in" to the demo.</li>
+</ol>
+<ul>
+<li>Signing out consists of generating a new channel to overwrite the cookie.</li>
+<li>A log out event could optionally be sent to the backplane channel via a server to server message if required by the implementation.</li>
+<li>View the code (javascript) of this page for more details.
+</ul>
+<br>
+</div>
+<h3>Events:</h3>
+<p id="textone">
+<ol id="event-list">
+</ol>
+</p><div id="hello"></div>
+<h3>Messages:</h3>
+<p id="texttwo">
+</p>
+<div class="clear"> </div>
+</div>
+<div id="footer">
+Janrain Backplane v1.2 demo <a href="http://backplanespec.com" target="_blank" >Visit the BackplaneSpec website</a>
+<a href="" onclick="Backplane.resetCookieChannel(); window.location.reload(); return false" style="float:right;">new channel</a></div>
+</div>
+
+</body></html>

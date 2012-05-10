@@ -1,0 +1,134 @@
+.clear {
+  clear:both;
+}
+#engage-signin,
+#capture-signin {
+  float:left;
+  display: none;
+  padding:3px;
+  padding-left:10px;
+  padding-right:10px;
+}
+h1 {
+  float:left;
+}
+h1,
+h2,
+h3,
+h4 {
+  display:inline;
+}
+#jscode-div {
+display:block;
+width:100%;
+height:100%;
+overflow:hidden;
+}
+#jscode {
+margin:3px;
+display:block;
+width:1000px;
+font-size:8pt;
+}
+#container {
+position:fixed;
+width:95%;
+height:98%;
+background-color:#DDD;
+color:#333333;
+border:1px solid #808080;
+margin:0;
+margin-left:3%;
+margin-right:1%;
+padding:0;
+}
+
+#top {
+border-bottom:1px solid #808080;
+padding:0;
+}
+
+#top h1 {
+margin:0;
+padding:0;
+padding-right:6px;
+}
+
+#top a {
+padding:6px;
+margin:3px;
+background-color:#EEE;
+}
+
+#welcome a {
+background-color:transparent;
+}
+
+#leftside {
+background-color:#FFF;
+background-image:url("http://backplane1-2.janraindemo.com/page-fade.png");
+background-position:right;
+background-repeat:repeat-y;
+float:left;
+width:10%;
+height:88%;
+margin:0;
+padding:0;
+}
+
+#leftside p {
+margin:0px 0px 10px 0px;
+}
+
+#content {
+background-color:#FFF;
+float:left;
+width:90%;
+height:88%;
+margin:0;
+padding:0;
+overflow:auto;
+}
+
+#content p {
+ margin:10px;
+}
+
+#footer {
+clear:both;
+color:#333333;
+background-color:#DDDDDD;
+border-top:1px solid #808080;
+margin:0;
+padding:0;
+}
+
+#content p {
+margin-left: 5px;
+}
+
+#information {
+background-color:#E3E3E3;
+}
+
+#textone,
+#texttwo {
+font-size:14px;
+font-weight:bold;
+padding:0;
+margin:0;
+}
+
+#texttwo pre {
+font-size:11px;
+font-weight:normal;
+}
+
+#welcome {
+float:right;
+}
+
+#event-list {
+font-weight:bold;
+list-style-type:decimal-leading-zero;
+}
